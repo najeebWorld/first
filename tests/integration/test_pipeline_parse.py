@@ -1,6 +1,6 @@
 import asyncio
 
-from src.parsers import (
+from src.infrastructure.sources.xianyu.parsers import (
     _parse_search_results_json,
     _parse_user_items_data,
     calculate_reputation_from_ratings,

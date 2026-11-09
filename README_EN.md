@@ -1,5 +1,12 @@
 # Xianyu Intelligent Monitor Bot
 
+> **Fork status: local demo only.** Phase 5.1 introduces a Hebrew vehicle demo CLI.
+> The Xianyu browser scraper and marketplace-cookie routes have been removed;
+> Yad2 is not authorized or enabled. The legacy web app is not production-ready.
+> Use [the current plan and demo commands](docs/PLAN.md#82-phase-51-implementation-and-demo).
+> The upstream features and setup instructions below are historical, not supported
+> instructions for this fork's new SaaS.
+
 [中文](README.md) ｜ [English]
 
 A Playwright and AI-powered multi-task real-time monitoring tool for Xianyu (闲鱼), featuring a complete web management interface.

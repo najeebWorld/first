@@ -1,5 +1,10 @@
 # 闲鱼智能监控系统
 
+> **Fork status: local demo only.** The Xianyu browser scraper and marketplace-cookie
+> routes have been removed. Yad2 is not authorized or enabled. Do not expose the
+> legacy web app publicly. See [the current plan and demo commands](docs/PLAN.md#82-phase-51-implementation-and-demo).
+> The upstream instructions below are historical and do not describe the new SaaS.
+
 [中文] ｜ [English](README_EN.md)
 
 基于 Playwright 和 AI 的闲鱼多任务实时监控，提供完整的 Web 管理界面。

@@ -14,9 +14,7 @@ from src.api.routes import (
     settings,
     prompts,
     results,
-    login_state,
     websocket,
-    accounts,
 )
 from src.api.dependencies import (
     set_process_service,
@@ -109,9 +107,7 @@ app.include_router(logs.router)
 app.include_router(settings.router)
 app.include_router(prompts.router)
 app.include_router(results.router)
-app.include_router(login_state.router)
 app.include_router(websocket.router)
-app.include_router(accounts.router)
 
 # 挂载静态文件
 # 旧的静态文件目录（用于截图等）

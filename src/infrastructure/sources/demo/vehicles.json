@@ -1,0 +1,46 @@
+[
+  {
+    "available_after_seconds": 0,
+    "listing": {
+      "source": "demo", "external_id": "demo-001", "category": "vehicles",
+      "title": "יונדאי i20 שנת 2020, יד ראשונה",
+      "description": "מודעת הדגמה פיקטיבית. 72,000 קילומטר, טיפול שנתי מתועד, גיר אוטומטי. ללא מידע מאומת על תאונות.",
+      "original_url": "https://demo.invalid/vehicles/demo-001",
+      "price_minor": 4300000, "currency": "ILS", "region": "center",
+      "fields": {"make": "hyundai", "model": "i20", "year": 2020, "km": 72000, "hand": 1, "seller_type": "private", "fuel_type": "petrol", "transmission": "automatic"}
+    }
+  },
+  {
+    "available_after_seconds": 0,
+    "listing": {
+      "source": "demo", "external_id": "demo-002", "category": "vehicles",
+      "title": "טויוטה קורולה 2018, יד שנייה",
+      "description": "מודעת הדגמה פיקטיבית. 118,000 קילומטר, רכב משפחתי מחיפה. המחיר גמיש.",
+      "original_url": "https://demo.invalid/vehicles/demo-002",
+      "price_minor": 5900000, "currency": "ILS", "region": "north",
+      "fields": {"make": "toyota", "model": "corolla", "year": 2018, "km": 118000, "hand": 2, "seller_type": "dealer", "fuel_type": "petrol", "transmission": "automatic"}
+    }
+  },
+  {
+    "available_after_seconds": 60,
+    "listing": {
+      "source": "demo", "external_id": "demo-003", "category": "vehicles",
+      "title": "יונדאי i20 שנת 2019, יד ראשונה, 64 אלף קילומטר",
+      "description": "מודעת הדגמה פיקטיבית. רכב אוטומטי מבאר שבע, ספר טיפולים זמין. יש לבדוק את מצב הרכב באופן עצמאי.",
+      "original_url": "https://demo.invalid/vehicles/demo-003",
+      "price_minor": 4100000, "currency": "ILS", "region": "south",
+      "fields": {"make": "hyundai", "model": "i20", "year": 2019, "km": 64000, "hand": 1, "seller_type": "private", "fuel_type": "petrol", "transmission": "automatic"}
+    }
+  },
+  {
+    "available_after_seconds": 120,
+    "listing": {
+      "source": "demo", "external_id": "demo-004", "category": "vehicles",
+      "title": "יונדאי i20 שנת 2021, נמכר כפי שהוא",
+      "description": "מודעת הדגמה פיקטיבית. הקילומטראז׳ לא נמסר. דרוש תיקון פחחות, נמכר כפי שהוא. סוג המוכר לא ידוע.",
+      "original_url": "https://demo.invalid/vehicles/demo-004",
+      "price_minor": 3600000, "currency": "ILS", "region": "center",
+      "fields": {"make": "hyundai", "model": "i20", "year": 2021, "km": null, "hand": 1, "seller_type": null, "transmission": "automatic"}
+    }
+  }
+]

@@ -1,97 +1,48 @@
 import asyncio
-import importlib
 import json
+import subprocess
 import sys
-import types
+from pathlib import Path
+
+import pytest
+
+import spider_v2
 
 
-def test_cli_runs_single_task_with_prompt(tmp_path, load_json_fixture, monkeypatch):
-    fake_scraper = types.ModuleType("src.scraper")
-
-    async def placeholder_scrape(task_config, debug_limit):
-        return 0
-
-    fake_scraper.scrape_xianyu = placeholder_scrape
-    monkeypatch.setitem(sys.modules, "src.scraper", fake_scraper)
-    sys.modules.pop("spider_v2", None)
-
-    spider_v2 = importlib.import_module("spider_v2")
-    config_data = load_json_fixture("config.sample.json")
-
-    base_prompt = "Base prompt. " + ("x" * 120) + " {{CRITERIA_SECTION}}"
-    criteria_prompt = "Criteria text for A7M4."
-
-    base_path = tmp_path / "base_prompt.txt"
-    criteria_path = tmp_path / "criteria_prompt.txt"
-    base_path.write_text(base_prompt, encoding="utf-8")
-    criteria_path.write_text(criteria_prompt, encoding="utf-8")
-
-    config_data[0]["ai_prompt_base_file"] = str(base_path)
-    config_data[0]["ai_prompt_criteria_file"] = str(criteria_path)
-
-    config_data[1]["ai_prompt_base_file"] = str(base_path)
-    config_data[1]["ai_prompt_criteria_file"] = str(criteria_path)
-
-    config_path = tmp_path / "config.json"
-    config_path.write_text(json.dumps(config_data, ensure_ascii=False), encoding="utf-8")
-
-    state_path = tmp_path / "state.json"
-    state_path.write_text("{}", encoding="utf-8")
-
-    monkeypatch.setattr(spider_v2, "STATE_FILE", str(state_path))
-
-    called = []
-
-    async def fake_scrape_xianyu(task_config, debug_limit):
-        called.append(task_config["task_name"])
-        assert "{{CRITERIA_SECTION}}" not in task_config["ai_prompt_text"]
-        assert "Criteria text for A7M4." in task_config["ai_prompt_text"]
-        return 1
-
-    monkeypatch.setattr(spider_v2, "scrape_xianyu", fake_scrape_xianyu)
-    monkeypatch.setattr(sys, "argv", ["spider_v2.py", "--config", str(config_path), "--task-name", "Sony A7M4"])
-
+def test_cli_runs_demo_without_credentials(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["spider_v2.py", "--demo-elapsed", "120", "--query", "יונדאי", "--filters", '{"km_max":80000}'])
     asyncio.run(spider_v2.main())
+    records = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
+    assert [record["listing"]["external_id"] for record in records] == ["demo-001", "demo-003", "demo-004"]
+    assert [record["rule_result"]["status"] for record in records] == ["passed", "passed", "deferred"]
 
-    assert called == ["Sony A7M4"]
 
-
-def test_cli_runs_keyword_mode_without_prompt_files(tmp_path, load_json_fixture, monkeypatch):
-    fake_scraper = types.ModuleType("src.scraper")
-
-    async def placeholder_scrape(task_config, debug_limit):
-        return 0
-
-    fake_scraper.scrape_xianyu = placeholder_scrape
-    monkeypatch.setitem(sys.modules, "src.scraper", fake_scraper)
-    sys.modules.pop("spider_v2", None)
-
-    spider_v2 = importlib.import_module("spider_v2")
-    config_data = load_json_fixture("config.sample.json")
-    config_data[0]["enabled"] = True
-    config_data[0]["decision_mode"] = "keyword"
-    config_data[0]["keyword_rules"] = ["a7m4", "验货宝"]
-    config_data[0]["ai_prompt_base_file"] = "missing_base.txt"
-    config_data[0]["ai_prompt_criteria_file"] = "missing_criteria.txt"
-
-    config_path = tmp_path / "config.json"
-    config_path.write_text(json.dumps(config_data, ensure_ascii=False), encoding="utf-8")
-
-    state_path = tmp_path / "state.json"
-    state_path.write_text("{}", encoding="utf-8")
-    monkeypatch.setattr(spider_v2, "STATE_FILE", str(state_path))
-
-    captured = []
-
-    async def fake_scrape_xianyu(task_config, debug_limit):
-        captured.append(task_config)
-        return 1
-
-    monkeypatch.setattr(spider_v2, "scrape_xianyu", fake_scrape_xianyu)
-    monkeypatch.setattr(sys, "argv", ["spider_v2.py", "--config", str(config_path), "--task-name", "Sony A7M4"])
-
+def test_cli_named_source_neutral_task(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "tasks.json"
+    path.write_text(json.dumps([
+        {"task_name": "selected", "source": "demo", "category": "vehicles", "text": "יונדאי"},
+        {"task_name": "other", "source": "demo", "category": "vehicles"},
+    ]), encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["spider_v2.py", "--config", str(path), "--task-name", "selected", "--demo-elapsed", "0"])
     asyncio.run(spider_v2.main())
+    records = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
+    assert [record["listing"]["external_id"] for record in records] == ["demo-001"]
 
-    assert len(captured) == 1
-    assert captured[0]["decision_mode"] == "keyword"
-    assert captured[0]["ai_prompt_text"] == ""
+
+@pytest.mark.parametrize("arguments", [
+    ["--task-name", "legacy"], ["--source", "xianyu"], ["--source", "yad2"],
+    ["--demo-elapsed", "nan"], ["--demo-elapsed", "-1"], ["--debug-limit", "-1"],
+])
+def test_cli_rejects_unsafe_or_invalid_options(arguments, monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["spider_v2.py", *arguments])
+    with pytest.raises(SystemExit) as error:
+        asyncio.run(spider_v2.main())
+    assert error.value.code == 2
+
+
+def test_cli_import_does_not_load_legacy_network_stack():
+    result = subprocess.run(
+        [sys.executable, "-c", "import spider_v2, sys; assert not any(name in sys.modules for name in ('src.scraper', 'src.config', 'src.ai_handler', 'playwright', 'openai'))"],
+        cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
