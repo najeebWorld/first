@@ -8,6 +8,12 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, '../dist'),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        demo: path.resolve(__dirname, 'demo.html'),
+      },
+    },
   },
   resolve: {
     alias: {
@@ -16,6 +22,14 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/demo-api': {
+        target: process.env.DEMO_API_TARGET || 'http://127.0.0.1:8011',
+        changeOrigin: true,
+      },
+      '/static/demo': {
+        target: process.env.DEMO_API_TARGET || 'http://127.0.0.1:8011',
+        changeOrigin: true,
+      },
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
